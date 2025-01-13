@@ -171,12 +171,12 @@ ${Object.entries(palette)
 }`;
     setCssSnippet(snippet);
   };
-  // const copyShareLink = () => {
-  //   const shareLink = window.location.href;
-  //   navigator.clipboard.writeText(shareLink);
-  //   alert("Share link copied to clipboard!");
-  // };
   const copyToClipboard = () => {
+    // const copyShareLink = () => {
+    //   const shareLink = window.location.href;
+    //   navigator.clipboard.writeText(shareLink);
+    //   alert("Share link copied to clipboard!");
+    // };
     navigator.clipboard.writeText(cssSnippet);
     alert("CSS variables copied to clipboard!");
   };
