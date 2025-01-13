@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import chroma from "chroma-js";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,33 +13,50 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "./ui/card";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Mockup from "./Mockup";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const colorKeys = [
-  "background",
-  "foreground",
-  "card",
-  "card-foreground",
-  "popover",
-  "popover-foreground",
-  "primary",
-  "primary-foreground",
-  "secondary",
-  "secondary-foreground",
-  "muted",
-  "muted-foreground",
-  "accent",
-  "accent-foreground",
-  "destructive",
-  "destructive-foreground",
-  "border",
-  "input",
-  "ring",
-];
+// const colorKeys = [
+//   "background",
+//   "foreground",
+//   "card",
+//   "card-foreground",
+//   "popover",
+//   "popover-foreground",
+//   "primary",
+//   "primary-foreground",
+//   "secondary",
+//   "secondary-foreground",
+//   "muted",
+//   "muted-foreground",
+//   "accent",
+//   "accent-foreground",
+//   "destructive",
+//   "destructive-foreground",
+//   "border",
+//   "input",
+//   "ring",
+// ];
 
 const PaletteGenerator = () => {
   const [palette, setPalette] = useState<Record<string, string>>({});
   const [cssSnippet, setCssSnippet] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const urlPalette = searchParams.get("palette");
+    const dark = searchParams.get("dark");
+    if (urlPalette) {
+      try {
+        const decodedPalette = JSON.parse(atob(urlPalette as string));
+        setPalette(decodedPalette);
+        setIsDarkMode(dark === "true");
+      } catch (error) {
+        console.error("Error parsing palette from URL:", error);
+      }
+    }
+  }, [searchParams]);
 
   const generateAccessiblePalette = () => {
     try {
@@ -128,9 +145,15 @@ const PaletteGenerator = () => {
       newPalette["ring"] = chroma(newPalette["primary"]).alpha(0.3).css();
 
       setPalette(newPalette);
+      updateURL(newPalette);
     } catch (error) {
       console.error("Error generating palette:", error);
     }
+  };
+
+  const updateURL = (newPalette: Record<string, string>) => {
+    const encodedPalette = btoa(JSON.stringify(newPalette));
+    router.push(`?palette=${encodedPalette}&dark=${isDarkMode}`);
   };
 
   const generateCssSnippet = () => {
@@ -148,7 +171,11 @@ ${Object.entries(palette)
 }`;
     setCssSnippet(snippet);
   };
-
+  // const copyShareLink = () => {
+  //   const shareLink = window.location.href;
+  //   navigator.clipboard.writeText(shareLink);
+  //   alert("Share link copied to clipboard!");
+  // };
   const copyToClipboard = () => {
     navigator.clipboard.writeText(cssSnippet);
     alert("CSS variables copied to clipboard!");
@@ -168,10 +195,14 @@ ${Object.entries(palette)
                 onCheckedChange={setIsDarkMode}
               />
               <span>Dark Mode</span>
+            </div>{" "}
+            <div className="flex items-center space-x-2">
+              <Button onClick={generateAccessiblePalette}>
+                Generate Palette
+              </Button>
+
+              {/* <Button onClick={copyShareLink}>Copy Share Link</Button> */}
             </div>
-            <Button onClick={generateAccessiblePalette}>
-              Generate Palette
-            </Button>
             <Dialog>
               <DialogTrigger asChild>
                 <Button onClick={generateCssSnippet}>
