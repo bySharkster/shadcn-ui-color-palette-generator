@@ -13,55 +13,35 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "./ui/card";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Mockup from "./Mockup";
-import { useRouter, useSearchParams } from "next/navigation";
-
-// const colorKeys = [
-//   "background",
-//   "foreground",
-//   "card",
-//   "card-foreground",
-//   "popover",
-//   "popover-foreground",
-//   "primary",
-//   "primary-foreground",
-//   "secondary",
-//   "secondary-foreground",
-//   "muted",
-//   "muted-foreground",
-//   "accent",
-//   "accent-foreground",
-//   "destructive",
-//   "destructive-foreground",
-//   "border",
-//   "input",
-//   "ring",
-// ];
+import { useSearchParams } from "next/navigation";
 
 const PaletteGenerator = () => {
   const [palette, setPalette] = useState<Record<string, string>>({});
   const [cssSnippet, setCssSnippet] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const urlPalette = searchParams.get("palette");
-    const dark = searchParams.get("dark");
-    if (urlPalette) {
-      try {
-        const decodedPalette = JSON.parse(atob(urlPalette as string));
-        setPalette(decodedPalette);
-        setIsDarkMode(dark === "true");
-      } catch (error) {
-        console.error("Error parsing palette from URL:", error);
+    const loadPaletteFromURL = () => {
+      const urlPalette = searchParams.get("palette");
+      const dark = searchParams.get("dark");
+      if (urlPalette) {
+        try {
+          const decodedPalette = JSON.parse(atob(urlPalette as string));
+          setPalette(decodedPalette);
+          setIsDarkMode(dark === "true");
+        } catch (error) {
+          console.error("Error parsing palette from URL:", error);
+        }
       }
-    }
+    };
+
+    loadPaletteFromURL();
   }, [searchParams]);
 
   const generateAccessiblePalette = () => {
     try {
       const newPalette: Record<string, string> = {};
-
       // Generate a random base hue
       const baseHue = Math.random() * 360;
 
@@ -153,7 +133,8 @@ const PaletteGenerator = () => {
 
   const updateURL = (newPalette: Record<string, string>) => {
     const encodedPalette = btoa(JSON.stringify(newPalette));
-    router.push(`?palette=${encodedPalette}&dark=${isDarkMode}`);
+    const newURL = `?palette=${encodedPalette}&dark=${isDarkMode}`;
+    window.history.pushState({}, "", newURL);
   };
 
   const generateCssSnippet = () => {
@@ -171,12 +152,14 @@ ${Object.entries(palette)
 }`;
     setCssSnippet(snippet);
   };
+
+  const copyShareLink = () => {
+    const shareLink = window.location.href;
+    navigator.clipboard.writeText(shareLink);
+    alert("Share link copied to clipboard!");
+  };
+
   const copyToClipboard = () => {
-    // const copyShareLink = () => {
-    //   const shareLink = window.location.href;
-    //   navigator.clipboard.writeText(shareLink);
-    //   alert("Share link copied to clipboard!");
-    // };
     navigator.clipboard.writeText(cssSnippet);
     alert("CSS variables copied to clipboard!");
   };
@@ -192,17 +175,17 @@ ${Object.entries(palette)
               <Switch
                 aria-label="Dark Mode"
                 checked={isDarkMode}
-                onCheckedChange={setIsDarkMode}
+                onCheckedChange={(checked) => {
+                  setIsDarkMode(checked);
+                  updateURL(palette);
+                }}
               />
               <span>Dark Mode</span>
-            </div>{" "}
-            <div className="flex items-center space-x-2">
-              <Button onClick={generateAccessiblePalette}>
-                Generate Palette
-              </Button>
-
-              {/* <Button onClick={copyShareLink}>Copy Share Link</Button> */}
             </div>
+            <Button onClick={generateAccessiblePalette}>
+              Generate Palette
+            </Button>
+            <Button onClick={copyShareLink}>Copy Share Link</Button>
             <Dialog>
               <DialogTrigger asChild>
                 <Button onClick={generateCssSnippet}>
