@@ -170,21 +170,6 @@ ${Object.entries(palettes.dark)
     alert("CSS variables copied to clipboard!");
   };
 
-  const getButtonStyles = () => ({
-    backgroundColor: isDarkMode
-      ? palettes.dark.primary
-      : palettes.light.primary,
-    color: isDarkMode
-      ? palettes.dark["primary-foreground"]
-      : palettes.light["primary-foreground"],
-    borderColor: isDarkMode ? palettes.dark.border : palettes.light.border,
-    "&:hover": {
-      backgroundColor: isDarkMode
-        ? chroma(palettes.dark.primary).darken().hex()
-        : chroma(palettes.light.primary).darken().hex(),
-    },
-  });
-
   return (
     <>
       <Mockup palette={isDarkMode ? palettes.dark : palettes.light} />
@@ -216,18 +201,15 @@ ${Object.entries(palettes.dark)
                 }
               }}
             />
-            <Button
-              onClick={generateAccessiblePalette}
-              style={getButtonStyles()}
-            >
+            <Button onClick={generateAccessiblePalette} variant="default">
               Generate Palette
             </Button>
-            <Button onClick={copyShareLink} style={getButtonStyles()}>
+            <Button onClick={copyShareLink} variant={"secondary"}>
               Copy Share Link
             </Button>
             <Dialog>
               <DialogTrigger asChild>
-                <Button onClick={generateCssSnippet} style={getButtonStyles()}>
+                <Button onClick={generateCssSnippet}>
                   Export CSS Variables
                 </Button>
               </DialogTrigger>
@@ -241,9 +223,7 @@ ${Object.entries(palettes.dark)
                 <pre className="p-4 bg-background rounded overflow-auto max-h-[400px]">
                   {cssSnippet}
                 </pre>
-                <Button onClick={copyToClipboard} style={getButtonStyles()}>
-                  Copy to Clipboard
-                </Button>
+                <Button onClick={copyToClipboard}>Copy to Clipboard</Button>
               </DialogContent>
             </Dialog>
           </div>
