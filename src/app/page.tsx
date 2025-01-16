@@ -1,4 +1,4 @@
-import PaletteGenerator from "@/components/PalleteGenerator";
+import PaletteGenerator from "@/components/PaletteGenerator";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
 
