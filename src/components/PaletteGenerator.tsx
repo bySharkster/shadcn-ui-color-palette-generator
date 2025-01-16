@@ -16,6 +16,7 @@ import Mockup from "./Mockup";
 import { useSearchParams } from "next/navigation";
 import { ModeToggle } from "./ModeToggle";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 
 const PaletteGenerator = () => {
   const { theme, systemTheme } = useTheme();
@@ -162,12 +163,32 @@ ${Object.entries(palettes.dark)
   const copyShareLink = () => {
     const shareLink = window.location.href;
     navigator.clipboard.writeText(shareLink);
-    alert("Share link copied to clipboard!");
+    toast.success("Share link copied to clipboard!", {
+      style: {
+        background: isDarkMode ? palettes.dark.card : palettes.light.card,
+        color: isDarkMode
+          ? palettes.dark["card-foreground"]
+          : palettes.light["card-foreground"],
+        border: `1px solid ${
+          isDarkMode ? palettes.dark.border : palettes.light.border
+        }`,
+      },
+    });
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(cssSnippet);
-    alert("CSS variables copied to clipboard!");
+    toast.success("CSS variables copied to clipboard!", {
+      style: {
+        background: isDarkMode ? palettes.dark.card : palettes.light.card,
+        color: isDarkMode
+          ? palettes.dark["card-foreground"]
+          : palettes.light["card-foreground"],
+        border: `1px solid ${
+          isDarkMode ? palettes.dark.border : palettes.light.border
+        }`,
+      },
+    });
   };
 
   return (
