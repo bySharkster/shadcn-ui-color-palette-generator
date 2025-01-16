@@ -48,7 +48,7 @@ export function ModeToggle({ onModeChange }: ModeToggleProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
           {theme === "dark" ? (
-            <Moon className="absolute h-full w-full transition-all dark:rotate-0 dark:scale-100 rotate-90 scale-0" />
+            <Moon className="absolute h-full w-full transition-all dark:rotate-0 dark:scale-100 rotate-90 scale-0 text-black" />
           ) : (
             <Sun className="absolute h-full w-full transition-all dark:-rotate-90 dark:scale-0 rotate-0 scale-100" />
           )}

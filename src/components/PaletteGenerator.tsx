@@ -170,13 +170,42 @@ ${Object.entries(palettes.dark)
     alert("CSS variables copied to clipboard!");
   };
 
+  const getButtonStyles = () => ({
+    backgroundColor: isDarkMode
+      ? palettes.dark.primary
+      : palettes.light.primary,
+    color: isDarkMode
+      ? palettes.dark["primary-foreground"]
+      : palettes.light["primary-foreground"],
+    borderColor: isDarkMode ? palettes.dark.border : palettes.light.border,
+    "&:hover": {
+      backgroundColor: isDarkMode
+        ? chroma(palettes.dark.primary).darken().hex()
+        : chroma(palettes.light.primary).darken().hex(),
+    },
+  });
+
   return (
     <>
       <Mockup palette={isDarkMode ? palettes.dark : palettes.light} />
 
-      <Card className="fixed bottom-2 inset-x-3 z-50 rounded-t-lg shadow-lg bg-card text-card-foreground">
+      <Card
+        className="fixed bottom-0 left-0 right-0 z-50 rounded-t-lg shadow-lg"
+        style={{
+          backgroundColor: isDarkMode
+            ? palettes.dark.card
+            : palettes.light.card,
+          color: isDarkMode
+            ? palettes.dark["card-foreground"]
+            : palettes.light["card-foreground"],
+          borderColor: isDarkMode
+            ? palettes.dark.border
+            : palettes.light.border,
+          borderTopWidth: "1px",
+        }}
+      >
         <CardContent className="p-4">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
             <ModeToggle
               onModeChange={(checked) => {
                 setIsDarkMode(checked);
@@ -187,13 +216,18 @@ ${Object.entries(palettes.dark)
                 }
               }}
             />
-            <Button onClick={generateAccessiblePalette}>
+            <Button
+              onClick={generateAccessiblePalette}
+              style={getButtonStyles()}
+            >
               Generate Palette
             </Button>
-            <Button onClick={copyShareLink}>Copy Share Link</Button>
+            <Button onClick={copyShareLink} style={getButtonStyles()}>
+              Copy Share Link
+            </Button>
             <Dialog>
               <DialogTrigger asChild>
-                <Button onClick={generateCssSnippet}>
+                <Button onClick={generateCssSnippet} style={getButtonStyles()}>
                   Export CSS Variables
                 </Button>
               </DialogTrigger>
@@ -207,7 +241,9 @@ ${Object.entries(palettes.dark)
                 <pre className="p-4 bg-background rounded overflow-auto max-h-[400px]">
                   {cssSnippet}
                 </pre>
-                <Button onClick={copyToClipboard}>Copy to Clipboard</Button>
+                <Button onClick={copyToClipboard} style={getButtonStyles()}>
+                  Copy to Clipboard
+                </Button>
               </DialogContent>
             </Dialog>
           </div>
