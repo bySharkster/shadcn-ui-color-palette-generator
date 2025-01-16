@@ -14,6 +14,8 @@ import { Card, CardContent } from "./ui/card";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Mockup from "./Mockup";
 import { useSearchParams } from "next/navigation";
+import { Label } from "./ui/label";
+import { Moon, Sun } from "lucide-react";
 
 const PaletteGenerator = () => {
   const [palette, setPalette] = useState<Record<string, string>>({});
@@ -137,17 +139,26 @@ const PaletteGenerator = () => {
     window.history.pushState({}, "", newURL);
   };
 
+  const formatColorValue = (color: string) => {
+    if (color.startsWith("hsl")) {
+      // Extract the HSL values and remove commas
+      return color.replace("hsl(", "").replace(")", "").replace(/,/g, "");
+    }
+    // Remove any commas from other color formats
+    return color.replace(/,/g, "");
+  };
+
   const generateCssSnippet = () => {
     const snippet = `:root {
 ${Object.entries(palette)
-  .map(([key, value]) => `  --${key}: ${value};`)
+  .map(([key, value]) => `  --${key}: ${formatColorValue(value)};`)
   .join("\n")}
   --radius: 0.5rem;
 }
 
 .dark {
 ${Object.entries(palette)
-  .map(([key, value]) => `  --${key}: ${value};`)
+  .map(([key, value]) => `  --${key}: ${formatColorValue(value)};`)
   .join("\n")}
 }`;
     setCssSnippet(snippet);
@@ -168,19 +179,23 @@ ${Object.entries(palette)
     <>
       <Mockup palette={palette} />
 
-      <Card className="fixed bottom-0 left-0 right-0 z-50 rounded-t-lg shadow-lg">
+      <Card className="fixed bottom-0 left-0 right-0 z-50 rounded-t-lg shadow-lg bg-card text-card-foreground">
         <CardContent className="p-4">
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center space-x-2">
+              {" "}
+              <Label htmlFor="dark-mode">
+                {isDarkMode ? <Moon /> : <Sun />}
+              </Label>
               <Switch
-                aria-label="Dark Mode"
+                id="dark-mode"
+                aria-label="Dark mode"
                 checked={isDarkMode}
                 onCheckedChange={(checked) => {
                   setIsDarkMode(checked);
                   updateURL(palette);
                 }}
               />
-              <span>Dark Mode</span>
             </div>
             <Button onClick={generateAccessiblePalette}>
               Generate Palette
@@ -199,7 +214,7 @@ ${Object.entries(palette)
                     <VisuallyHidden>CSS Variables Preview</VisuallyHidden>
                   </DialogTitle>
                 </DialogHeader>
-                <pre className="p-4 bg-gray-100 rounded overflow-auto max-h-[400px]">
+                <pre className="p-4 bg-background rounded overflow-auto max-h-[400px]">
                   {cssSnippet}
                 </pre>
                 <Button onClick={copyToClipboard}>Copy to Clipboard</Button>
